@@ -32,7 +32,9 @@ QVariant MessagesModel::data(const QModelIndex& idx, int role) const
     if (role == TextRole) return m.text;
     if (role == MediaUrlRole) return m.mediaUrl;
     if (role == UserIdRole) return m.userId;
-    if (role == TimestampRole) return m.timestampMs;
+    if (role == TimestampRole) {
+        return m.timestampMs;
+    }
     if (role == IsMineRole) return m.userId == me;
     if (role == AvatarRole)
         return (m.userId == me) ? QString() : contacts->avatarById(m.userId);

@@ -1,4 +1,6 @@
 import QtQuick
+import Config
+import "../"
 
 Item {
     id: root
@@ -9,7 +11,7 @@ Item {
         width: root.height * 0.6
         height: root.height * 0.6
 
-        source: "assets/current_user_photo.jpg"
+        source: Config.assetsBase + "/current_user_photo.jpg"
         anchors.left: parent.left
         anchors.leftMargin: 10
         anchors.verticalCenter: parent.verticalCenter
@@ -28,7 +30,7 @@ Item {
         id: newMessage
         width: root.height * 0.3
         height: root.height * 0.3
-        source: "assets/icons/icon-write.svg"
+        source: Config.assetsBase + "/icons/icon-write.svg"
         sourceSize.width: root.height * 0.3
         sourceSize.height: root.height * 0.3
         anchors.verticalCenter: parent.verticalCenter

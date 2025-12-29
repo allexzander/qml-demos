@@ -52,15 +52,15 @@ void ContactsModel::setCurrentUserId(const QString& id)
 
 QString ContactsModel::nameById(const QString& id) const
 {
-    for (const auto& c : m_contacts)
-        if (c.id == id) return c.name;
+    for (const auto& contact : std::as_const(m_contacts))
+        if (contact.id == id) return contact.name;
     return {};
 }
 
 QString ContactsModel::avatarById(const QString& id) const
 {
-    for (const auto& c : m_contacts)
-        if (c.id == id) return c.avatarUrl;
+    for (const auto& contact : std::as_const(m_contacts))
+        if (contact.id == id) return contact.avatarUrl;
     return {};
 }
 
@@ -83,7 +83,8 @@ void ContactsModel::loadDummyData()
         Contact contact = {
             generateUuid(),
             contactNames.at(i),
-            QString("assets/user_photos/user_photo_%1").arg(i + 1)
+            QString("assets/user_photos/user_photo_%1.jpg")
+                .arg(i + 1)
         };
         m_contacts.push_back(contact);
     }

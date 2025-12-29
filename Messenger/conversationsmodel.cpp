@@ -1,6 +1,7 @@
 #include "conversationsmodel.hpp"
 #include <QDateTime>
 #include <QRandomGenerator>
+#include<QTimer>
 
 static QVariantList collectAvatarUrls(const Conversation& c,
                                       const ContactsModel* contacts)
@@ -59,6 +60,23 @@ static bool randomBool()
     return QRandomGenerator::global()->bounded(2) == 1;
 }
 
+static QStringList dummyMessageReplies()
+{
+    return {
+        "Sounds good 👍",
+        "Got it!",
+        "Let me check.",
+        "Haha 😄",
+        "Alright!",
+        "Give me a second.",
+        "That makes sense.",
+        "Sure thing.",
+        "I'll get back to you.",
+        "😂😂",
+        "Hmm… interesting."
+    };
+}
+
 ConversationsModel* ConversationsModel::s_instance = nullptr;
 
 ConversationsModel::ConversationsModel(QObject* parent)
@@ -67,7 +85,6 @@ ConversationsModel::ConversationsModel(QObject* parent)
     s_instance = this;
     m_messagesModel = new MessagesModel(this);
     loadDummyData();
-    m_currentConversationId = m_conversations.first().id;
 }
 
 ConversationsModel* ConversationsModel::instance()
@@ -171,10 +188,107 @@ void ConversationsModel::markCurrentConversationRead()
         }
     }
 }
+
+void ConversationsModel::sendMessage(const QString& message)
+{
+    if (!message.isEmpty()) {
+        for (int row = 0; row < m_conversations.size(); ++row) {
+            if (m_conversations[row].id == m_currentConversationId) {
+
+                const auto* contacts = ContactsModel::instance();
+                assert(contacts);
+                if (!contacts) {
+                    return;
+                }
+
+                m_conversations[row].messages.push_back({ generateUuid(), contacts->currentUserId(), message, "", QDateTime::currentMSecsSinceEpoch() });
+
+                const QModelIndex idx = index(row, 0);
+                emit dataChanged(idx, idx, { LastMessageRole, LastMessageTsRole,});
+
+                m_messagesModel->setMessages(m_conversations[row].messages);
+
+                emit messagesModelChanged();
+
+                scheduleDummyReply(m_currentConversationId);
+
+                return;
+            }
+        }
+    }
+}
+
+void ConversationsModel::handleMessageReceived(const QString& conversationId, const QString& senderUserId, const QString& text)
+{
+    if (text.isEmpty())
+        return;
+
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+
+    for (int row = 0; row < m_conversations.size(); ++row) {
+        auto& conversation = m_conversations[row];
+        if (conversation.id != conversationId)
+            continue;
+
+        conversation.messages.push_back({
+            generateUuid(),
+            senderUserId,
+            text,
+            "",
+            now
+        });
+
+        const QModelIndex idx = index(row, 0);
+        emit dataChanged(idx, idx, { LastMessageRole, LastMessageTsRole });
+
+        if (m_currentConversationId == conversationId) {
+            m_messagesModel->setMessages(conversation.messages);
+            emit messagesModelChanged();
+            emit messageReceived();
+        }
+
+        return;
+    }
+}
+
+void ConversationsModel::scheduleDummyReply(const QString& conversationId)
+{
+    const auto delayMs = QRandomGenerator::global()->bounded(1, 4) * 1000;
+    QTimer::singleShot(delayMs, this, [this, conversationId]() {
+        const auto* contacts = ContactsModel::instance();
+        if (!contacts)
+            return;
+
+        for (const auto& conversation : std::as_const(m_conversations)) {
+            if (conversation.id != conversationId)
+                continue;
+
+            // Pick someone else (not current user)
+            QStringList candidates = conversation.participantIds;
+            candidates.removeAll(contacts->currentUserId());
+            if (candidates.isEmpty())
+                return;
+
+            const QString sender = candidates.at(QRandomGenerator::global()->bounded(candidates.size()));
+
+            const QStringList replies = dummyMessageReplies();
+            const int replyCount = QRandomGenerator::global()->bounded(1, 4); // 1–3
+
+            for (int i = 0; i < replyCount; ++i) {
+                const QString text = replies.at(QRandomGenerator::global()->bounded(replies.size()));
+
+                handleMessageReceived(conversationId, sender, text);
+            }
+
+            return;
+        }
+    });
+}
+
 const Conversation* ConversationsModel::conversationById(const QString& id) const
 {
-    for (const auto& c : m_conversations)
-        if (c.id == id) return &c;
+    for (const auto& conversation : std::as_const(m_conversations))
+        if (conversation.id == id) return &conversation;
     return nullptr;
 }
 
@@ -199,6 +313,10 @@ void ConversationsModel::loadDummyData()
     const qint64 now = QDateTime::currentMSecsSinceEpoch();
 
     const auto* contacts = ContactsModel::instance();
+    assert(contacts);
+    if (!contacts) {
+        return;
+    }
 
     const int numContacts = contacts->rowCount({});
 

@@ -76,15 +76,21 @@ public:
     MessagesModel* messagesModel() const;
 
     Q_INVOKABLE void markCurrentConversationRead();
+    Q_INVOKABLE void sendMessage(const QString& message);
+
+    Q_INVOKABLE void handleMessageReceived(const QString& conversationId, const QString& senderUserId, const QString& text);
 
 signals:
     void currentConversationIdChanged();
     void currentConversationChanged();
     void currentConversationAvatarUrlsChanged();
     void messagesModelChanged();
+    void messageReceived();
 
 private:
     void loadDummyData();
+
+    void scheduleDummyReply(const QString& conversationId);
 
     inline QString generateUuid()
     {

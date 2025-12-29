@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Config
 
 Rectangle {
     id: root
@@ -32,7 +33,7 @@ Rectangle {
         spacing: 0
 
         Image {
-            source: "assets/icons/icon-search.svg"
+            source: Config.assetsBase + "/icons/icon-search.svg"
             sourceSize.width: searchField.height * 0.8
             sourceSize.height: searchField.height * 0.8
             Layout.leftMargin: 5

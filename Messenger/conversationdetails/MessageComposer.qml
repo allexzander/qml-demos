@@ -1,18 +1,30 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Config
+import Messenger
 
 Item {
     id: root
 
     property alias text: messageInput.text
-    signal textEdited(string text)
+    signal messageSent()
 
     implicitHeight: 30
 
+    Connections {
+        target: ConversationsModel
+
+        function onCurrentConversationIdChanged() {
+            if (!messageInput.readOnly && !messageInput.activeFocus) {
+                messageInput.focus = true
+            }
+        }
+    }
+
     Image {
         id: iconAttachment
-        source: "assets/icons/icon-plus.svg"
+        source: Config.assetsBase + "/icons/icon-plus.svg"
         sourceSize.width: messageInput.height * 0.8
         sourceSize.height: messageInput.height * 0.8
         anchors.left: parent.left
@@ -44,16 +56,27 @@ Item {
             color: "#ffffff"
             placeholderTextColor: "#525252"
             font.pixelSize: root.height * 0.4
-            onTextChanged: root.textEdited(text)
             anchors.left: parent.left
             anchors.right: iconSticker.left
             anchors.leftMargin: 5
             anchors.verticalCenter: parent.verticalCenter
+            readOnly: ConversationsModel.currentConversationId === ""
+            enabled: ConversationsModel.currentConversationId !== ""
+            onAccepted: {
+                if (ConversationsModel.currentConversation) {
+                    ConversationsModel.sendMessage(messageInput.text)
+                    messageInput.text = ""
+                    root.messageSent()
+                }
+            }
+            onReadOnlyChanged: {
+                messageInput.focus = !readOnly
+            }
         }
 
         Image {
             id: iconSticker
-            source: "assets/icons/icon-sticker.svg"
+            source: Config.assetsBase + "/icons/icon-sticker.svg"
             sourceSize.width: messageInput.height * 0.8
             sourceSize.height: messageInput.height * 0.8
             anchors.right: iconEmoji.left
@@ -66,7 +89,7 @@ Item {
 
         Image {
             id: iconEmoji
-            source: "assets/icons/icon-smile.svg"
+            source: Config.assetsBase + "/icons/icon-smile.svg"
             sourceSize.width: messageInput.height * 0.8
             sourceSize.height: messageInput.height * 0.8
             anchors.right: parent.right
@@ -80,7 +103,7 @@ Item {
 
     Image {
         id: iconLike
-        source: "assets/icons/icon-like.svg"
+        source: Config.assetsBase + "/icons/icon-like.svg"
         sourceSize.width: messageInput.height * 0.8
         sourceSize.height: messageInput.height * 0.8
         anchors.right: parent.right

@@ -11,7 +11,6 @@ Item {
     Image {
         id: userAvatar
         anchors.fill: parent
-        source: "assets/current_user_photo.jpg"
         fillMode: Image.PreserveAspectCrop
         smooth: true
         visible: false

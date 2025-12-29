@@ -1,4 +1,6 @@
 import QtQuick
+import Config
+import Messenger
 
 Item {
     id: root
@@ -6,41 +8,6 @@ Item {
     required property ListView listView
     required property var model
     required property int index
-
-
-    function timeAgo(timestampMs) {
-        if (!timestampMs || timestampMs === 0)
-            return ""
-
-        const seconds = Math.floor((Date.now() - timestampMs) / 1000)
-
-        if (seconds < 60)
-            return "now"
-
-        const minutes = Math.floor(seconds / 60)
-        if (minutes < 60)
-            return minutes + "m"
-
-        const hours = Math.floor(minutes / 60)
-        if (hours < 24)
-            return hours + "h"
-
-        const days = Math.floor(hours / 24)
-        if (days < 7)
-            return days + "d"
-
-        const weeks = Math.floor(days / 7)
-        if (weeks < 4)
-            return weeks + "w"
-
-        const months = Math.floor(days / 30)
-        if (months < 12)
-            return months + "mo"
-
-        const years = Math.floor(days / 365)
-        return years + "y"
-    }
-
 
     width: listView.width
     implicitHeight: contactAvatar.implicitHeight
@@ -106,7 +73,7 @@ Item {
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
 
-                text: "· " + root.timeAgo(root.model.lastMessage.timestampMs)
+                text: "· " + Config.timeAgo(root.model.lastMessage.timestampMs)
                 color: "#525252"
                 font.pixelSize: root.height * 0.2
             }
@@ -123,7 +90,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: 4
-            source: "assets/icons/new-message-icon.svg"
+            source: Config.assetsBase + "/icons/new-message-icon.svg"
             width: root.model.isRead ? 0 : root.height * 0.2
             height: root.model.isRead ? 0 : root.height * 0.2
             sourceSize.width: root.model.isRead ? 0 : root.height * 0.2
