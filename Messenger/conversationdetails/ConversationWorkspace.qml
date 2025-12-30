@@ -19,9 +19,13 @@ Rectangle {
         function onMessagesModelChanged() {
             Qt.callLater(checkReadState)
         }
+    }
 
-        function onMessageReceived() {
-            chatRoomMessages.positionViewAtEnd()
+    Connections {
+        target: ConversationsModel.messagesModel
+
+        function onRowsInserted(parent, first, last) {
+            Qt.callLater(() => chatRoomMessages.positionViewAtEnd())
         }
     }
 
@@ -71,9 +75,6 @@ Rectangle {
         MessageComposer {
             Layout.fillWidth: true
             Layout.preferredHeight: root.height * 0.1
-            onMessageSent: {
-                chatRoomMessages.positionViewAtEnd()
-            }
         }
     }
 }

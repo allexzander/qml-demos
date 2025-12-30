@@ -1,30 +1,32 @@
 #include "messagesmodel.hpp"
 
-MessagesModel* MessagesModel::s_instance = nullptr;
-
 MessagesModel::MessagesModel(QObject* parent)
     : QAbstractListModel(parent)
 {
-    s_instance = this;
-}
-
-MessagesModel* MessagesModel::instance()
-{
-    return s_instance;
 }
 
 int MessagesModel::rowCount(const QModelIndex&) const
 {
-    return m_messages.size();
+    if (m_currentConversationId.isEmpty()) {
+        return 0;
+    }
+    return m_messages[m_currentConversationId].size();
 }
 
 QVariant MessagesModel::data(const QModelIndex& idx, int role) const
 {
-    if (!idx.isValid() || idx.row() < 0 || idx.row() >= m_messages.size()) {
+    if (m_currentConversationId.isEmpty() || !idx.isValid() || idx.row() < 0) {
         return {};
     }
 
-    const auto& m = m_messages[idx.row()];
+    const auto& messages = m_messages[m_currentConversationId];
+
+    if (idx.row() >= messages.size()) {
+        return {};
+    }
+
+    const auto& m = messages[idx.row()];
+
     const auto* contacts = ContactsModel::instance();
     const QString me = contacts->currentUserId();
 
@@ -59,8 +61,35 @@ QHash<int, QByteArray> MessagesModel::roleNames() const
     };
 }
 
-void MessagesModel::setMessages(const QVector<Message>& messages) {
+void MessagesModel::setMessages(const QString& conversationId, const QVector<Message>& messages) {
+    if (conversationId == m_currentConversationId) {
+        beginResetModel();
+    }
+    m_messages[conversationId] = messages;
+    if (conversationId == m_currentConversationId) {
+        endResetModel();
+    }
+}
+
+void MessagesModel::addMessage(const QString& conversationId, const Message& message)
+{
+    if (conversationId == m_currentConversationId) {
+        beginInsertRows(QModelIndex(), rowCount({}), rowCount({}));
+    }
+    m_messages[conversationId].push_back(message);
+    if (conversationId == m_currentConversationId) {
+        endInsertRows();
+    }
+}
+
+void MessagesModel::setCurrentConversationId(const QString& conversationId)
+{
     beginResetModel();
-    m_messages = messages;
+    m_currentConversationId = conversationId;
     endResetModel();
+}
+
+const QVector<Message> MessagesModel::messagesForConversation(const QString& conversationId) const
+{
+    return m_messages[conversationId];
 }

@@ -8,7 +8,6 @@ Item {
     id: root
 
     property alias text: messageInput.text
-    signal messageSent()
 
     implicitHeight: 30
 
@@ -66,7 +65,6 @@ Item {
                 if (ConversationsModel.currentConversation) {
                     ConversationsModel.sendMessage(messageInput.text)
                     messageInput.text = ""
-                    root.messageSent()
                 }
             }
             onReadOnlyChanged: {

@@ -112,10 +112,12 @@ QVariant ConversationsModel::data(const QModelIndex& idx, int role) const
     case DisplayTitleRole:
         return computeDisplayTitle(c, contacts);
 
-    case LastMessageRole:
-        if (c.messages.isEmpty())
+    case LastMessageRole: {
+        const auto messages = m_messagesModel->messagesForConversation(c.id);
+        if (messages.isEmpty())
             return QVariant::fromValue(Message{});
-        return QVariant::fromValue(c.messages.last());
+        return QVariant::fromValue(messages.last());
+    }
 
     case IsReadRole:
         return c.isRead;
@@ -158,7 +160,7 @@ void ConversationsModel::setCurrentConversationId(const QString& id)
 
     m_currentConversationId = id;
 
-    m_messagesModel->setMessages(conversationById(id)->messages);
+    m_messagesModel->setCurrentConversationId(m_currentConversationId);
 
     emit currentConversationIdChanged();
     emit currentConversationChanged();
@@ -201,13 +203,12 @@ void ConversationsModel::sendMessage(const QString& message)
                     return;
                 }
 
-                m_conversations[row].messages.push_back({ generateUuid(), contacts->currentUserId(), message, "", QDateTime::currentMSecsSinceEpoch() });
+                const Message newMessage { generateUuid(), contacts->currentUserId(), message, "", QDateTime::currentMSecsSinceEpoch() };
+
+                m_messagesModel->addMessage(m_currentConversationId, newMessage);
 
                 const QModelIndex idx = index(row, 0);
                 emit dataChanged(idx, idx, { LastMessageRole, LastMessageTsRole,});
-
-                m_messagesModel->setMessages(m_conversations[row].messages);
-
                 emit messagesModelChanged();
 
                 scheduleDummyReply(m_currentConversationId);
@@ -230,22 +231,19 @@ void ConversationsModel::handleMessageReceived(const QString& conversationId, co
         if (conversation.id != conversationId)
             continue;
 
-        conversation.messages.push_back({
+        const Message newMessage {
             generateUuid(),
             senderUserId,
             text,
             "",
             now
-        });
+        };
+
+        m_messagesModel->addMessage(m_currentConversationId, newMessage);
 
         const QModelIndex idx = index(row, 0);
         emit dataChanged(idx, idx, { LastMessageRole, LastMessageTsRole });
-
-        if (m_currentConversationId == conversationId) {
-            m_messagesModel->setMessages(conversation.messages);
-            emit messagesModelChanged();
-            emit messageReceived();
-        }
+        emit messagesModelChanged();
 
         return;
     }
@@ -341,7 +339,8 @@ void ConversationsModel::loadDummyData()
         conversation.participantIds = { contactId };
         conversation.isGroup = false;
         conversation.isRead = randomBool();
-        conversation.messages = {
+
+        QVector<Message> messages {
             { generateUuid(), contactId, "What's up?", "", now - 300000 },
             { generateUuid(), contactId, "Have you seen a new movie already?", "", now - 320000 },
             { generateUuid(), contacts->currentUserId(), "Not really", "", now - 350000 },
@@ -349,6 +348,7 @@ void ConversationsModel::loadDummyData()
         };
 
         m_conversations.push_back(conversation);
+        m_messagesModel->setMessages(conversation.id, messages);
     }
 
     for (int row = 3; ; ++row) {
@@ -372,14 +372,15 @@ void ConversationsModel::loadDummyData()
         conversation.participantIds = { contactId };
         conversation.isGroup = false;
         conversation.isRead = randomBool();
-        conversation.messages = {
+        QVector<Message> messages {
             { generateUuid(), contactId, "Hey! So about that transfer...", "", now - 370000 },
             { generateUuid(), contactId, "Do you mind if I send it tomorrow?", "", now - 340000 },
             { generateUuid(), contacts->currentUserId(), "Well, in fact it's quite urgent", "", now - 330000 },
             { generateUuid(), contactId, "Alright then! Nevermind, gonna do it now...", "", now - 10000 }
         };
-        processAddedMessages(conversation.messages);
+        processAddedMessages(messages);
         m_conversations.push_back(conversation);
+        m_messagesModel->setMessages(conversation.id, messages);
     }
 
     for (int row = 0; ; ++row) {
@@ -403,14 +404,15 @@ void ConversationsModel::loadDummyData()
         conversation.participantIds = { contactId };
         conversation.isGroup = false;
         conversation.isRead = randomBool();
-        conversation.messages = {
+        QVector<Message> messages {
             { generateUuid(), contacts->currentUserId(), "Hey are you there?", "", now - 80000 },
             { generateUuid(), contacts->currentUserId(), "I've got a quick question", "", now - 79000 },
             { generateUuid(), contactId, "Sorry, been on a meeting, what's it about?", "", now - 50000 },
             { generateUuid(), contactId, "NVM, solved already", "", now - 10000 }
         };
-        processAddedMessages(conversation.messages);
+        processAddedMessages(messages);
         m_conversations.push_back(conversation);
+        m_messagesModel->setMessages(conversation.id, messages);
     }
 
 
@@ -434,7 +436,8 @@ void ConversationsModel::loadDummyData()
         conversation.isGroup = true;
         conversation.isRead = false;
         conversation.participantIds = participantIds;
-        conversation.messages = {
+
+        QVector<Message> messages {
             { generateUuid(), participantIds.first(), "haha", "", now - 90000 },
             { generateUuid(), contacts->currentUserId(), "hahahah", "", now - 87000 },
             { generateUuid(), contacts->currentUserId(), "Let's invite Paul?", "", now - 85000 },
@@ -467,7 +470,9 @@ void ConversationsModel::loadDummyData()
             { generateUuid(), participantIds.at(2), "Yeah, let's hang out with fun this time :)", "", now - 28000 },
             { generateUuid(), contacts->currentUserId(), "Alrighty then!", "", now - 26000 }
         };
-        processAddedMessages(conversation.messages);
+
+        processAddedMessages(messages);
         m_conversations.push_back(conversation);
+        m_messagesModel->setMessages(conversation.id, messages);
     }
 }

@@ -23,7 +23,6 @@ public:
     bool isRead;
     QStringList participantIds;
     bool isGroup = false;
-    QVector<Message> messages;
 };
 
 class ConversationsModel final : public QAbstractListModel {
@@ -85,7 +84,6 @@ signals:
     void currentConversationChanged();
     void currentConversationAvatarUrlsChanged();
     void messagesModelChanged();
-    void messageReceived();
 
 private:
     void loadDummyData();

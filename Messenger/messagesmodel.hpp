@@ -2,6 +2,7 @@
 
 #include <QAbstractListModel>
 #include <QtQml/qqml.h>
+#include <QHash>
 #include "datatypes.hpp"
 
 #include "contactsmodel.hpp"
@@ -25,15 +26,19 @@ public:
     Q_ENUM(Roles)
 
     explicit MessagesModel(QObject* parent = nullptr);
-    static MessagesModel* instance();
 
     int rowCount(const QModelIndex&) const override;
     QVariant data(const QModelIndex&, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    void setMessages(const QVector<Message>& messages);
+    void setMessages(const QString& conversationId, const QVector<Message>& messages);
+    void addMessage(const QString& conversationId, const Message& message);
+
+    void setCurrentConversationId(const QString& conversationId);
+
+    const QVector<Message> messagesForConversation(const QString& conversationId) const;
 
 private:
-    QVector<Message> m_messages;
-    static MessagesModel* s_instance;
+    QHash<QString, QVector<Message>> m_messages;
+    QString m_currentConversationId;
 };
