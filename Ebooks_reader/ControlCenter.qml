@@ -126,12 +126,6 @@ Rectangle {
         Item {
             width: parent.width
             height: parent.height - root.headerHeight
-            Text {
-                anchors.centerIn: parent
-                text: "Control center"
-                font.pixelSize: 22
-                color: "#000000"
-            }
         }
     }
 }

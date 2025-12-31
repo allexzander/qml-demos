@@ -28,13 +28,9 @@ Window {
             anchors.fill: parent
             currentIndex: tabs.currentIndex
 
-            Rectangle {
+            HomePage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Text {
-                    anchors.centerIn: parent
-                    text: "Home"
-                }
             }
             Rectangle {
                 Layout.fillWidth: true

@@ -20,6 +20,8 @@ qt_add_qml_module(appEbooks_reader
         QML_FILES IconTabButton.qml
         QML_FILES ControlCenter.qml
         RESOURCES assets/icon-battery.svg assets/icon-brightness.svg assets/icon-refresh.svg assets/icon-search.svg assets/icon-wifi.svg
+        QML_FILES HomePage.qml
+        RESOURCES assets/books/book1.jpg assets/books/book2.jpg assets/books/book3.jpg assets/books/book4.jpg
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
