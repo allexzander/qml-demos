@@ -69,8 +69,8 @@ Window {
                 Rectangle {
                     anchors.top: parent.top
                     width: parent.width
-                    height: 1
-                    color: "#777777"
+                    height: Config.tabsHeight
+                    color: "#ffffff"
                 }
             }
 

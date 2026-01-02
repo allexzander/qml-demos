@@ -2,7 +2,7 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    readonly property int sectionsVerticalSpacing: 40
+    readonly property int sectionsVerticalSpacing: 60
     readonly property int appWindowWidth: 720
     readonly property int appWindowHeight: 960
     readonly property int contentTopMargin: 5
@@ -18,6 +18,7 @@ QtObject {
     readonly property color deviderColor: "#D0D0D0"
     readonly property int maxBooksInCollectionsPreview: 3
     readonly property int mediumMargin: 16
+    readonly property int largeMargin: 24
     readonly property int lastReadBooksDisplayCount: 4
     readonly property int mainContentHorizontalMargin: 24
     readonly property int bookStackHorizontalOffsetStep: 100

@@ -4,288 +4,278 @@ import QtQuick.Layouts
 import QtQuick.Effects
 import Config
 
-Column {
+Item {
     id: root
 
     readonly property int booksSpacing: Config.mediumMargin
     readonly property int lastReadBooksDisplayCount: Config.lastReadBooksDisplayCount
-
     readonly property real bookAspectRatio: Config.bookCoverAspect
 
-    readonly property real totalSpacing: booksSpacing * (lastReadBooksDisplayCount - 1)
-    readonly property real totalBooksWidth: width - totalSpacing
+    readonly property int scrollBarPadding: Config.mediumMargin
 
-    // calc single book dimensions
-    readonly property real bookWidth: totalBooksWidth / lastReadBooksDisplayCount
-    readonly property real bookHeight: Math.min(bookWidth * bookAspectRatio, height)
+    readonly property real totalSpacing:
+        booksSpacing * (lastReadBooksDisplayCount - 1)
+
+    readonly property real totalBooksWidth:
+        width - totalSpacing - scrollBarPadding
+
+    readonly property real bookWidth:
+        totalBooksWidth / lastReadBooksDisplayCount
+
+    readonly property real bookHeight:
+        bookWidth * bookAspectRatio
+
+
+    ListModel {
+        id: listBooksEbook
+        ListElement { progress: 2; remaining: 18000; bookCoverSource: "assets/books/book5.jpg" }
+        ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book6.jpg" }
+        ListElement { progress: 2; remaining: 7200;  bookCoverSource: "assets/books/book8.jpg" }
+        ListElement { progress: 3; remaining: 14400; bookCoverSource: "assets/books/book9.jpg" }
+    }
+
+    ListModel {
+        id: listBooksAudio
+        ListElement { progress: 2; remaining: 18000; bookCoverSource: "assets/books/book10.jpg" }
+        ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book2.jpg" }
+        ListElement { progress: 2; remaining: 7200;  bookCoverSource: "assets/books/book1.jpg" }
+        ListElement { progress: 3; remaining: 14400; bookCoverSource: "assets/books/book7.jpg" }
+    }
 
     ListModel {
         id: listBooksOneDrive
-        ListElement { progress: 2;  remaining: 18000; bookCoverSource: "assets/books/book1.jpg" }
+        ListElement { progress: 2; remaining: 18000; bookCoverSource: "assets/books/book1.jpg" }
         ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book2.jpg" }
-        ListElement { progress: 2;  remaining: 7200;  bookCoverSource: "assets/books/book3.jpg" }
-        ListElement { progress: 3;  remaining: 14400; bookCoverSource: "assets/books/book4.jpg" }
-    }
-    ListModel {
-        id: listBooksEbook
-        ListElement { progress: 2;  remaining: 18000; bookCoverSource: "assets/books/book5.jpg" }
-        ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book6.jpg" }
-        ListElement { progress: 2;  remaining: 7200;  bookCoverSource: "assets/books/book8.jpg" }
-        ListElement { progress: 3;  remaining: 14400; bookCoverSource: "assets/books/book9.jpg" }
-    }
-    ListModel {
-        id: listBooksAudio
-        ListElement { progress: 2;  remaining: 18000; bookCoverSource: "assets/books/book10.jpg" }
-        ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book2.jpg" }
-        ListElement { progress: 2;  remaining: 7200;  bookCoverSource: "assets/books/book1.jpg" }
-        ListElement { progress: 3;  remaining: 14400; bookCoverSource: "assets/books/book7.jpg" }
+        ListElement { progress: 2; remaining: 7200;  bookCoverSource: "assets/books/book3.jpg" }
+        ListElement { progress: 3; remaining: 14400; bookCoverSource: "assets/books/book4.jpg" }
     }
 
-    TabBar {
-        id: tabs
-        width: parent.width
-        height: Config.textTabsHeight
 
-        property var tabTitles: ["eBooks", "AudioBooks", "OneDrive"]
-        property real maxTabTextWidth: 0
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
 
-        TextMetrics {
-            id: metrics
-            font.pixelSize: Config.tabsFontPixelSize
-        }
-
-        function recomputeMaxWidth() {
-            let max = 0
-            for (let i = 0; i < tabTitles.length; ++i) {
-                metrics.text = tabTitles[i]
-                max = Math.max(max, metrics.width)
-            }
-            maxTabTextWidth = max
-        }
-
-        Component.onCompleted: recomputeMaxWidth()
-
-        background: Item {
-            Rectangle {
-                anchors.bottom: parent.bottom
-                width: parent.width
-                height: 1
-                color: Config.deviderColor
-            }
-        }
-
-        Repeater {
-            model: tabs.tabTitles
-
-            TabsButton {
-                text: modelData
-                width: tabs.maxTabTextWidth + 20   // 10px left + right
-            }
-        }
-    }
-
-    Item {
-        width: parent.width
-        height: 20
-    }
-
-    StackLayout {
-        currentIndex: tabs.currentIndex
-
-        Row {
-            id: ebooks
+        TabBar {
+            id: tabs
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            spacing: booksSpacing
+            Layout.preferredHeight: Config.textTabsHeight
 
-            readonly property bool showProgress: false
+            property var tabTitles: ["eBooks", "AudioBooks", "OneDrive"]
+            property real maxTabTextWidth: 0
+
+            TextMetrics {
+                id: metrics
+                font.pixelSize: Config.tabsFontPixelSize
+            }
+
+            Component.onCompleted: {
+                let max = 0
+                for (let i = 0; i < tabTitles.length; ++i) {
+                    metrics.text = tabTitles[i]
+                    max = Math.max(max, metrics.width)
+                }
+                maxTabTextWidth = max
+            }
+
+            background: Item {
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    width: parent.width
+                    height: 1
+                    color: Config.deviderColor
+                }
+            }
 
             Repeater {
-                model: listBooksEbook
-
-                Column {
-                    width: bookWidth
-                    spacing: 4
-
-                    Item {
-                        width: parent.width
-                        height: bookHeight
-
-                        Image {
-                            anchors.bottom: parent.bottom
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            width: parent.width
-                            height: parent.height
-                            source: bookCoverSource
-                            fillMode: Image.PreserveAspectFit
-                            smooth: true
-
-                            layer.enabled: true
-                            layer.effect: MultiEffect {
-                                saturation: -1.0
-                            }
-
-                        }
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: 10
-                        visible: ebooks.showProgress
-                    }
-
-                    Text {
-                        visible: ebooks.showProgress
-                        width: parent.width
-                        horizontalAlignment: Text.AlignLeft
-                        text: qsTr("%1% Read").arg(progress)
-                        font.pixelSize: Config.titleFontPixelSize
-                        color: "#000000"
-                    }
-
-                    Text {
-                        visible: ebooks.showProgress
-                        width: parent.width
-                        horizontalAlignment: Text.AlignLeft
-                        text: qsTr("%1 HOURS TO GO")
-                            .arg(Math.max(1, Math.ceil(remaining / 3600)))
-                        font.pixelSize: Config.descriptionFontPixelSize
-                        font.capitalization: Font.AllUppercase
-                        color: "#777777"
-                    }
+                model: tabs.tabTitles
+                TabsButton {
+                    text: modelData
+                    width: tabs.maxTabTextWidth + 20
                 }
             }
         }
-        Row {
-            id: audiobooks
+
+        Item {
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            spacing: booksSpacing
-
-            readonly property bool showProgress: false
-
-            Repeater {
-                model: listBooksAudio
-
-                Column {
-                    width: bookWidth
-                    spacing: 4
-
-                    Item {
-                        width: parent.width
-                        height: bookHeight
-
-                        Image {
-                            anchors.bottom: parent.bottom
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            width: parent.width
-                            height: parent.height
-                            source: bookCoverSource
-                            fillMode: Image.PreserveAspectFit
-                            smooth: true
-
-                            layer.enabled: true
-                            layer.effect: MultiEffect {
-                                saturation: -1.0
-                            }
-
-                        }
-                    }
-
-                    Item {
-                        visible: audiobooks.showProgress
-                        width: parent.width
-                        height: 10
-                    }
-
-                    Text {
-                        visible: audiobooks.showProgress
-                        width: parent.width
-                        horizontalAlignment: Text.AlignLeft
-                        text: qsTr("%1% Read").arg(progress)
-                        font.pixelSize: Config.titleFontPixelSize
-                        color: "#000000"
-                    }
-
-                    Text {
-                        visible: audiobooks.showProgress
-                        width: parent.width
-                        horizontalAlignment: Text.AlignLeft
-                        text: qsTr("%1 HOURS TO GO")
-                            .arg(Math.max(1, Math.ceil(remaining / 3600)))
-                        font.pixelSize: Config.descriptionFontPixelSize
-                        font.capitalization: Font.AllUppercase
-                        color: "#777777"
-                    }
-                }
-            }
+            Layout.preferredHeight: Config.largeMargin
         }
-        Row {
-            id: booksOneDrive
+
+        StackLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: booksSpacing
+            currentIndex: tabs.currentIndex
 
-            readonly property bool showProgress: false
 
-            Repeater {
-                model: listBooksOneDrive
+            Flickable {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                clip: true
+                flickableDirection: Flickable.VerticalFlick
+
+                contentWidth: width
+                contentHeight: ebooksColumn.implicitHeight
+
+                ScrollBar.vertical: ScrollBar {
+                    id: scrollBar
+                    policy: ScrollBar.AsNeeded
+                }
 
                 Column {
-                    width: bookWidth
-                    spacing: 4
+                    id: ebooksColumn
+                    width: parent.width - scrollBar.width - scrollBarPadding
+                    spacing: Config.largeMargin
 
-                    Item {
-                        width: parent.width
-                        height: bookHeight
+                    readonly property var sections: [
+                        {
+                            name: "Best of Non-Fiction",
+                            actionLabel: "View all",
+                            model: listBooksEbook
+                        },
+                        {
+                            name: "Newest Arrivals",
+                            actionLabel: "View all",
+                            model: listBooksEbook
+                        },
+                        {
+                            name: "Bestsellers 2025",
+                            actionLabel: "View all",
+                            model: listBooksEbook
+                        },
+                        {
+                            name: "Recommended for You",
+                            actionLabel: "View all",
+                            model: listBooksEbook
+                        }
+                    ]
 
-                        Image {
-                            anchors.bottom: parent.bottom
-                            anchors.horizontalCenter: parent.horizontalCenter
+                    Repeater {
+                        model: ebooksColumn.sections
 
-                            width: parent.width
-                            height: parent.height
-                            source: bookCoverSource
-                            fillMode: Image.PreserveAspectFit
-                            smooth: true
+                        DiscoverPageSection {
+                            width: ebooksColumn.width
+                            spacing: Config.mediumMargin
 
-                            layer.enabled: true
-                            layer.effect: MultiEffect {
-                                saturation: -1.0
-                            }
-
+                            name: modelData.name
+                            actionLabel: modelData.actionLabel
+                            model: modelData.model
+                            booksSpacing: root.booksSpacing
                         }
                     }
+                }
 
-                    Item {
-                        visible: booksOneDrive.showProgress
-                        width: parent.width
-                        height: 10
-                    }
+            }
 
-                    Text {
-                        visible: booksOneDrive.showProgress
-                        width: parent.width
-                        horizontalAlignment: Text.AlignLeft
-                        text: qsTr("%1% Read").arg(progress)
-                        font.pixelSize: Config.titleFontPixelSize
-                        color: "#000000"
-                    }
 
-                    Text {
-                        visible: booksOneDrive.showProgress
-                        width: parent.width
-                        horizontalAlignment: Text.AlignLeft
-                        text: qsTr("%1 HOURS TO GO")
-                            .arg(Math.max(1, Math.ceil(remaining / 3600)))
-                        font.pixelSize: Config.descriptionFontPixelSize
-                        font.capitalization: Font.AllUppercase
-                        color: "#777777"
+            Flickable {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                flickableDirection: Flickable.VerticalFlick
+
+                contentWidth: width
+                contentHeight: audioColumn.implicitHeight
+
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AsNeeded
+                }
+
+                Column {
+                    id: audioColumn
+                    width: parent.width - scrollBarPadding
+                    spacing: Config.largeMargin
+
+                    readonly property var sections: [
+                        {
+                            name: "Favorite Voice",
+                            actionLabel: "View all",
+                            model: listBooksAudio
+                        },
+                        {
+                            name: "Top Narrators",
+                            actionLabel: "View all",
+                            model: listBooksAudio
+                        },                        {
+                            name: "Selected Books",
+                            actionLabel: "View all",
+                            model: listBooksAudio
+                        }
+                    ]
+
+                    Repeater {
+                        model: audioColumn.sections
+
+                        DiscoverPageSection {
+                            width: audioColumn.width
+                            spacing: Config.mediumMargin
+
+                            name: modelData.name
+                            actionLabel: modelData.actionLabel
+                            model: modelData.model
+                            booksSpacing: root.booksSpacing
+                        }
                     }
                 }
             }
+
+
+            Flickable {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                flickableDirection: Flickable.VerticalFlick
+
+                contentWidth: width
+                contentHeight: onedriveColumn.implicitHeight
+
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AsNeeded
+                }
+
+                Column {
+                    id: onedriveColumn
+                    width: parent.width - scrollBarPadding
+                    spacing: Config.largeMargin
+
+                    readonly property var sections: [
+                        {
+                            name: "Award Winners",
+                            actionLabel: "View all",
+                            model: listBooksOneDrive
+                        },
+                        {
+                            name: "Recently Synced",
+                            actionLabel: "View all",
+                            model: listBooksOneDrive
+                        },
+                        {
+                            name: "Actively Read",
+                            actionLabel: "View all",
+                            model: listBooksOneDrive
+                        },
+                        {
+                            name: "Rarely Read",
+                            actionLabel: "View all",
+                            model: listBooksOneDrive
+                        }
+                    ]
+
+                    Repeater {
+                        model: onedriveColumn.sections
+
+                        DiscoverPageSection {
+                            width: onedriveColumn.width
+                            spacing: Config.mediumMargin
+
+                            name: modelData.name
+                            actionLabel: modelData.actionLabel
+                            model: modelData.model
+                            booksSpacing: root.booksSpacing
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

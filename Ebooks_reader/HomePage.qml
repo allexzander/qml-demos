@@ -43,68 +43,21 @@ Item {
         ListElement { bookCoverSource: "assets/books/book10.jpg" }
     }
 
-    Row {
+    ListBooks {
         id: library
         anchors {
             left: parent.left
             right: parent.right
-            topMargin: 12
         }
         spacing: booksSpacing
+        booksSpacing: Config.mediumMargin
+        lastReadBooksDisplayCount: Config.lastReadBooksDisplayCount
 
-        Repeater {
-            model: lastReadBooks
+        bookAspectRatio: Config.bookCoverAspect
 
-            Column {
-                width: bookWidth
-                spacing: 4
+        showProgress: true
 
-                Item {
-                    width: parent.width
-                    height: bookHeight
-
-                    Image {
-                        anchors.bottom: parent.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        width: parent.width
-                        height: parent.height
-                        source: bookCoverSource
-                        fillMode: Image.PreserveAspectFit
-                        smooth: true
-
-                        layer.enabled: true
-                        layer.effect: MultiEffect {
-                            saturation: -1.0
-                        }
-
-                    }
-                }
-
-                Item {
-                    width: parent.width
-                    height: 10
-                }
-
-                Text {
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                    text: qsTr("%1% Read").arg(progress)
-                    font.pixelSize: Config.titleFontPixelSize
-                    color: "#000000"
-                }
-
-                Text {
-                    width: parent.width
-                    horizontalAlignment: Text.AlignLeft
-                    text: qsTr("%1 HOURS TO GO")
-                        .arg(Math.max(1, Math.ceil(remaining / 3600)))
-                    font.pixelSize: Config.descriptionFontPixelSize
-                    font.capitalization: Font.AllUppercase
-                    color: "#777777"
-                }
-            }
-        }
+        model: lastReadBooks
     }
 
     BookStack {
