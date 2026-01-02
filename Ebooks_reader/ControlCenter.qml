@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Controls
+import Config
 
 Rectangle {
     id: root
 
     property int collapsedHeight: 100
-    property int expandedHeight: Math.round((parent?.height || 1200) * 0.75)
-    property int headerHeight: 56
+    property int expandedHeight: Math.round(root.height * 0.75)
 
     property bool expanded: false
     property real startHeight: collapsedHeight
@@ -16,7 +16,7 @@ Rectangle {
     height: collapsedHeight
 
     color: "transparent"
-    border.color: expanded ? "#777777" : "transparent"
+    border.color: expanded ? Config.titleFontColor : "transparent"
     border.width: expanded ? 1 : 0
 
     function expand() {
@@ -69,19 +69,19 @@ Rectangle {
         spacing: 0
 
         Item {
-            height: root.headerHeight
+            height: root.collapsedHeight * 0.6
             width: parent.width
 
             Text {
                 id: timeText
                 anchors {
                     left: parent.left
-                    leftMargin: 16
+                    leftMargin: Config.mediumMargin
                     verticalCenter: parent.verticalCenter
                 }
                 text: Qt.formatTime(new Date(), "hh:mm AP")
-                font.pixelSize: 16
-                color: "#000000"
+                font.pixelSize: Config.infoFontPixelSize
+                color: Config.titleFontColor
             }
 
             Timer {
@@ -96,10 +96,10 @@ Rectangle {
             Row {
                 anchors {
                     right: parent.right
-                    rightMargin: 16
+                    rightMargin: Config.mediumMargin
                     verticalCenter: parent.verticalCenter
                 }
-                spacing: 14
+                spacing: Config.smallSpacing
 
                 Repeater {
                     model: [
@@ -114,18 +114,13 @@ Rectangle {
                         source: modelData
                         sourceSize.width: width
                         sourceSize.height: height
-                        width: 24
-                        height: 24
+                        width: root.collapsedHeight * 0.3
+                        height: root.collapsedHeight * 0.3
                         fillMode: Image.PreserveAspectFit
                         smooth: true
                     }
                 }
             }
-        }
-
-        Item {
-            width: parent.width
-            height: parent.height - root.headerHeight
         }
     }
 }

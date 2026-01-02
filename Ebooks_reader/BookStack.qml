@@ -6,20 +6,17 @@ Item {
     id: root
 
     property alias model: repeater.model
-    property string title: ""
-    property string subtitle: ""
-
+    property alias title: title.text
+    property alias subtitle: subtitle.text
     property int maxBooks: 3
     property real bookWidth: 120
-    property real aspectRatio: 1.55
-
-    property real xOffsetStep: 100
+    property real bookHeight: bookWidth * aspectRatio
+    property real aspectRatio: Config.bookCoverAspect
+    property real xOffsetStep: Config.bookStackHorizontalOffsetStep
     property real yOffsetStep: bookHeight * 0.1
 
-    readonly property real bookHeight: bookWidth * aspectRatio
-
     width: bookWidth + xOffsetStep * (maxBooks - 1)
-    implicitHeight: stack.height + labels.implicitHeight
+    implicitHeight: bookHeight + labels.implicitHeight
 
     Item {
         id: stack
@@ -64,22 +61,24 @@ Item {
         id: labels
         anchors {
             top: stack.bottom
-            topMargin: 8
+            topMargin: Config.smallMargin
             left: stack.left
         }
-        spacing: 2
+        spacing: Config.tinySpacing
 
         Text {
+            id: title
             text: root.title
             font.pixelSize: Config.titleFontPixelSize
             font.weight: Font.Medium
-            color: "#000000"
+            color: Config.titleFontColor
         }
 
         Text {
+            id: subtitle
             text: root.subtitle
             font.pixelSize: Config.descriptionFontPixelSize
-            color: "#777777"
+            color: Config.descriptionFontColor
             font.capitalization: Font.AllUppercase
         }
     }

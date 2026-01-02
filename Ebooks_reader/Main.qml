@@ -17,7 +17,11 @@ Window {
         anchors.topMargin: controlCenter.collapsedHeight + Config.contentTopMargin
 
         Item {
-            width: parent.width
+            id: mainContent
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: Config.mainContentHorizontalMargin
+            anchors.rightMargin: Config.mainContentHorizontalMargin
             height: parent.height - tabs.height
 
             MouseArea {
@@ -41,13 +45,9 @@ Window {
                         text: "My Books"
                     }
                 }
-                Rectangle {
+                DiscoverPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Discover"
-                    }
                 }
                 Rectangle {
                     Layout.fillWidth: true
@@ -84,7 +84,7 @@ Window {
                     { label: "More",     iconSource: "assets/icon-more.svg" }
                 ]
 
-                IconTabButton {
+                MainTabsButton {
                     text: modelData.label
                     width:  tabs.width / tabs.count
                     iconSource: modelData.iconSource

@@ -5,25 +5,17 @@ import Config
 Item {
     id: root
 
-    // ===== CONSTANTS =====
-    readonly property int horizontalMargin: 24
-    readonly property int columnSpacing: 16
-    readonly property int booksCount: 4
+    readonly property int booksSpacing: Config.mediumMargin
+    readonly property int lastReadBooksDisplayCount: Config.lastReadBooksDisplayCount
 
-    readonly property real coverAspectRatio: 1.55   // portrait
-    readonly property int textBlockHeight: 36        // progress + remaining
+    readonly property real bookAspectRatio: Config.bookCoverAspect
 
-    // Width per book
-    readonly property real bookWidth:
-        (width - horizontalMargin * 2
-               - columnSpacing * (booksCount - 1))
-        / booksCount
+    readonly property real totalSpacing: booksSpacing * (lastReadBooksDisplayCount - 1)
+    readonly property real totalBooksWidth: width - totalSpacing
 
-    readonly property real coverHeight:
-        Math.min(
-            bookWidth * coverAspectRatio,
-            height - textBlockHeight
-        )
+    // calc single book dimensions
+    readonly property real bookWidth: totalBooksWidth / lastReadBooksDisplayCount
+    readonly property real bookHeight: Math.min(bookWidth * bookAspectRatio, height)
 
     ListModel {
         id: lastReadBooks
@@ -56,11 +48,9 @@ Item {
         anchors {
             left: parent.left
             right: parent.right
-            leftMargin: horizontalMargin
-            rightMargin: horizontalMargin
             topMargin: 12
         }
-        spacing: columnSpacing
+        spacing: booksSpacing
 
         Repeater {
             model: lastReadBooks
@@ -71,7 +61,7 @@ Item {
 
                 Item {
                     width: parent.width
-                    height: coverHeight
+                    height: bookHeight
 
                     Image {
                         anchors.bottom: parent.bottom
@@ -122,11 +112,12 @@ Item {
         anchors.topMargin: Config.sectionsVerticalSpacing
         anchors.top: library.bottom
         anchors.left: library.left
-        width: root.bookWidth * 2 + root.columnSpacing
+        width: root.bookWidth * 2 + root.booksSpacing
         model: availableBooks
-        xOffsetStep: (width - bookWidth + root.columnSpacing) / (maxBooks - 1)
+        xOffsetStep: (width - bookWidth + root.booksSpacing) / (maxBooks - 1)
         bookWidth: root.bookWidth
-        maxBooks: Math.min(3, availableBooks.count)
+        bookHeight: root.bookHeight
+        maxBooks: Math.min(Config.maxBooksInCollectionsPreview, availableBooks.count)
         title: qsTr("My Books")
         subtitle: qsTr("%1 Books").arg(availableBooks.count)
     }
@@ -136,11 +127,12 @@ Item {
         anchors.topMargin: Config.sectionsVerticalSpacing
         anchors.top: library.bottom
         anchors.right: library.right
-        width: root.bookWidth * 2 + root.columnSpacing
+        width: root.bookWidth * 2 + root.booksSpacing
         model: availableBooksCollection
-        xOffsetStep: (width - bookWidth + root.columnSpacing) / (maxBooks - 1)
+        xOffsetStep: (width - bookWidth + root.booksSpacing) / (maxBooks - 1)
         bookWidth: root.bookWidth
-        maxBooks: Math.min(3, availableBooksCollection.count)
+        bookHeight: root.bookHeight
+        maxBooks: Math.min(Config.maxBooksInCollectionsPreview, availableBooksCollection.count)
         title: qsTr("Manga")
         subtitle: qsTr("Collection")
     }
