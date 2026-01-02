@@ -1,23 +1,25 @@
 import QtQuick
 import QtQuick.Controls
+import Config
 
 TabButton {
     id: root
 
     property alias iconSource: icon.source
-    property color activeColor: "#000000"
-    property color inactiveColor: "#777777"
+    property color activeColor: Config.titleFontColor
+    property color inactiveColor: Config.descriptionFontColor
 
-    implicitWidth: 108
-    implicitHeight: 64
+    implicitWidth: 100
+    implicitHeight: Config.tabsHeight
 
     contentItem: Item {
-        anchors.centerIn: parent
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
 
         Image {
             id: icon
-            width: 24
-            height: 24
+            width: parent.height * 0.4
+            height: width
             sourceSize.width: width
             sourceSize.height: height
 
@@ -31,10 +33,10 @@ TabButton {
         Text {
             id: label
             text: root.text
-            font.pixelSize: 12
+            font.pixelSize: Config.tabsFontPixelSize
             color: root.checked ? root.activeColor : root.inactiveColor
             anchors.top: icon.bottom
-            anchors.topMargin: 5
+            anchors.topMargin: Config.smallMargin
             anchors.horizontalCenter: icon.horizontalCenter
         }
     }

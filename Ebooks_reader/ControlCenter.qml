@@ -114,8 +114,8 @@ Rectangle {
                         source: modelData
                         sourceSize.width: width
                         sourceSize.height: height
-                        width: 20
-                        height: 20
+                        width: 24
+                        height: 24
                         fillMode: Image.PreserveAspectFit
                         smooth: true
                     }

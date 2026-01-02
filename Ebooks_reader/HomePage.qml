@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import Config
 
 Item {
     id: root
@@ -32,9 +33,29 @@ Item {
         ListElement { progress: 3;  remaining: 14400; bookCoverSource: "assets/books/book4.jpg" }
     }
 
+
+    ListModel {
+        id: availableBooks
+        ListElement { bookCoverSource: "assets/books/book5.jpg" }
+        ListElement { bookCoverSource: "assets/books/book6.jpg" }
+        ListElement { bookCoverSource: "assets/books/book7.jpg" }
+        ListElement { bookCoverSource: "assets/books/book8.jpg" }
+        ListElement { bookCoverSource: "assets/books/book9.jpg" }
+        ListElement { bookCoverSource: "assets/books/book10.jpg" }
+    }
+
+    ListModel {
+        id: availableBooksCollection
+        ListElement { bookCoverSource: "assets/books/book8.jpg" }
+        ListElement { bookCoverSource: "assets/books/book9.jpg" }
+        ListElement { bookCoverSource: "assets/books/book10.jpg" }
+    }
+
     Row {
+        id: library
         anchors {
-            fill: parent
+            left: parent.left
+            right: parent.right
             leftMargin: horizontalMargin
             rightMargin: horizontalMargin
             topMargin: 12
@@ -70,12 +91,16 @@ Item {
                     }
                 }
 
+                Item {
+                    width: parent.width
+                    height: 10
+                }
+
                 Text {
                     width: parent.width
                     horizontalAlignment: Text.AlignLeft
                     text: qsTr("%1% Read").arg(progress)
-                    font.pixelSize: 18
-                    font.weight: Font.Bold
+                    font.pixelSize: Config.titleFontPixelSize
                     color: "#000000"
                 }
 
@@ -84,11 +109,58 @@ Item {
                     horizontalAlignment: Text.AlignLeft
                     text: qsTr("%1 HOURS TO GO")
                         .arg(Math.max(1, Math.ceil(remaining / 3600)))
-                    font.pixelSize: 14
+                    font.pixelSize: Config.descriptionFontPixelSize
                     font.capitalization: Font.AllUppercase
                     color: "#777777"
                 }
             }
         }
     }
+
+    BookStack {
+        id: bookStackLeft
+        anchors.topMargin: Config.sectionsVerticalSpacing
+        anchors.top: library.bottom
+        anchors.left: library.left
+        width: root.bookWidth * 2 + root.columnSpacing
+        model: availableBooks
+        xOffsetStep: (width - bookWidth + root.columnSpacing) / (maxBooks - 1)
+        bookWidth: root.bookWidth
+        maxBooks: Math.min(3, availableBooks.count)
+        title: qsTr("My Books")
+        subtitle: qsTr("%1 Books").arg(availableBooks.count)
+    }
+
+    BookStack {
+        id: bookStackRight
+        anchors.topMargin: Config.sectionsVerticalSpacing
+        anchors.top: library.bottom
+        anchors.right: library.right
+        width: root.bookWidth * 2 + root.columnSpacing
+        model: availableBooksCollection
+        xOffsetStep: (width - bookWidth + root.columnSpacing) / (maxBooks - 1)
+        bookWidth: root.bookWidth
+        maxBooks: Math.min(3, availableBooksCollection.count)
+        title: qsTr("Manga")
+        subtitle: qsTr("Collection")
+    }
+
+    InfoCard {
+        anchors.topMargin: Config.sectionsVerticalSpacing
+        anchors.top: bookStackLeft.bottom
+        anchors.left: bookStackLeft.left
+        title: qsTr("Find your next great read")
+        subtitle: qsTr("Shop Kobo")
+        maxWidth: bookStackLeft.width
+    }
+
+    InfoCard {
+        anchors.topMargin: Config.sectionsVerticalSpacing
+        anchors.top: bookStackRight.bottom
+        anchors.left: bookStackRight.left
+        title: qsTr("Create a Wishlist of books you're interested in")
+        subtitle: qsTr("Wishlist")
+        maxWidth: bookStackRight.width
+    }
+
 }

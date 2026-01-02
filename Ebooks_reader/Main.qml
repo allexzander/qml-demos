@@ -1,11 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Config
 
 Window {
     id: root
-    minimumWidth: 900
-    minimumHeight: 1200
+    minimumWidth: Config.appWindowWidth
+    minimumHeight: Config.appWindowHeight
     maximumWidth: minimumWidth
     maximumHeight: minimumHeight
     visible: true
@@ -13,7 +14,7 @@ Window {
 
     Column {
         anchors.fill: parent
-        anchors.topMargin: controlCenter.collapsedHeight
+        anchors.topMargin: controlCenter.collapsedHeight + Config.contentTopMargin
 
         Item {
             width: parent.width
@@ -24,44 +25,45 @@ Window {
                 onClicked: controlCenter.collapse()
             }
 
-        StackLayout {
-            anchors.fill: parent
-            currentIndex: tabs.currentIndex
+            StackLayout {
+                anchors.fill: parent
+                currentIndex: tabs.currentIndex
 
-            HomePage {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Text {
-                    anchors.centerIn: parent
-                    text: "My Books"
+                HomePage {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Text {
+                        anchors.centerIn: parent
+                        text: "My Books"
+                    }
+                }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Discover"
+                    }
+                }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Text {
+                        anchors.centerIn: parent
+                        text: "More"
+                    }
                 }
             }
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Text {
-                    anchors.centerIn: parent
-                    text: "Discover"
-                }
-            }
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Text {
-                    anchors.centerIn: parent
-                    text: "More"
-                }
-            }
-        }
         }
 
         TabBar {
             id: tabs
             width: parent.width
+            height: Config.tabsHeight
 
             background: Item {
                 Rectangle {
@@ -71,6 +73,8 @@ Window {
                     color: "#777777"
                 }
             }
+
+            spacing: 0
 
             Repeater {
                 model: [
@@ -82,6 +86,7 @@ Window {
 
                 IconTabButton {
                     text: modelData.label
+                    width:  tabs.width / tabs.count
                     iconSource: modelData.iconSource
                     onPressed: controlCenter.collapse()
                 }

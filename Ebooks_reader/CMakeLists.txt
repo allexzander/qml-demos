@@ -12,16 +12,23 @@ qt_add_executable(appEbooks_reader
     main.cpp
 )
 
+add_subdirectory(Config)
+
 qt_add_qml_module(appEbooks_reader
     URI Ebooks_reader
     QML_FILES
         Main.qml
-        RESOURCES assets/icon-books.svg assets/icon-discover.svg assets/icon-home.svg assets/icon-more.svg
+        RESOURCES  assets/icon-discover.svg assets/icon-home.svg assets/icon-more.svg
         QML_FILES IconTabButton.qml
         QML_FILES ControlCenter.qml
-        RESOURCES assets/icon-battery.svg assets/icon-brightness.svg assets/icon-refresh.svg assets/icon-search.svg assets/icon-wifi.svg
+        RESOURCES assets/icon-battery.svg assets/icon-books.svg assets/icon-brightness.svg assets/icon-refresh.svg assets/icon-search.svg assets/icon-wifi.svg
         QML_FILES HomePage.qml
         RESOURCES assets/books/book1.jpg assets/books/book2.jpg assets/books/book3.jpg assets/books/book4.jpg
+        RESOURCES assets/books/book5.jpg assets/books/book6.jpg assets/books/book7.jpg assets/books/book8.jpg assets/books/book9.jpg assets/books/book10.jpg
+        QML_FILES BookStack.qml
+        QML_FILES InfoCard.qml
+    DEPENDENCIES
+        TARGET Config
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -36,7 +43,7 @@ set_target_properties(appEbooks_reader PROPERTIES
 )
 
 target_link_libraries(appEbooks_reader
-    PRIVATE Qt6::Quick
+    PRIVATE Qt6::Quick Configplugin
 )
 
 include(GNUInstallDirs)
