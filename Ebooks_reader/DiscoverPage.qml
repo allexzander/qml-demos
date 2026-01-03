@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Effects
 import Config
 import Ebooks_reader
 
@@ -12,6 +11,7 @@ Item {
     readonly property int lastReadBooksDisplayCount: Config.lastReadBooksDisplayCount
     readonly property real bookAspectRatio: Config.bookCoverAspect
     readonly property int scrollBarPadding: Config.mediumMargin
+    readonly property int scrollBarWidth: 12
 
     readonly property real totalSpacing:
         booksSpacing * (lastReadBooksDisplayCount - 1)
@@ -86,8 +86,10 @@ Item {
                 contentWidth: width
                 contentHeight: ebooksColumn.implicitHeight
 
-                ScrollBar.vertical: ScrollBar {
+                ScrollBar.vertical: ScrollBarCustom {
+                    id: vScrollBar
                     policy: ScrollBar.AsNeeded
+                    width: root.scrollBarWidth
                 }
 
                 Column {
@@ -133,8 +135,9 @@ Item {
                 contentWidth: width
                 contentHeight: audioColumn.implicitHeight
 
-                ScrollBar.vertical: ScrollBar {
+                ScrollBar.vertical: ScrollBarCustom {
                     policy: ScrollBar.AsNeeded
+                    width: root.scrollBarWidth
                 }
 
                 Column {
@@ -178,8 +181,9 @@ Item {
                 contentWidth: width
                 contentHeight: onedriveColumn.implicitHeight
 
-                ScrollBar.vertical: ScrollBar {
+                ScrollBar.vertical: ScrollBarCustom {
                     policy: ScrollBar.AsNeeded
+                    width: root.scrollBarWidth
                 }
 
                 Column {

@@ -4,7 +4,7 @@
 #include <QDateTime>
 #include <QUuid>
 #include <QtQml>
-#include "bookEnums.hpp"
+#include "bookenums.hpp"
 
 struct Book
 {
@@ -17,15 +17,17 @@ public:
     QUuid id;
 
     QString title;
+    QString subtitle;
     QString author;
     BookEnums::Category category;
 
+    quint64 size = 0;
+
     QString coverSource;
 
-    qreal progress = 0.0;          // 0.0 – 1.0
-    int remainingSeconds = 0;      // seconds
+    qreal progress = 0.0;
+    int remainingSeconds = 0;
 
-    // State
     QDateTime addedAt;
     BookEnums::Location location;
 };

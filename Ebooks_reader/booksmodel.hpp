@@ -16,13 +16,16 @@ public:
     enum Roles {
         IdRole = Qt::UserRole + 1,
         TitleRole,
+        SubTitleRole,
         AuthorRole,
         CategoryRole,
         CoverRole,
         ProgressRole,
         RemainingRole,
         AddedAtRole,
-        LocationRole
+        LocationRole,
+        LocationStringRole,
+        SizeRole
     };
     Q_ENUM(Roles)
 
@@ -40,6 +43,7 @@ public:
 
 private:
     void generateDummyDataFromCovers();
+    static QString locationToString(BookEnums::Location location);
 
 private:
     QList<Book> m_allBooks;

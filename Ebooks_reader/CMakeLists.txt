@@ -45,6 +45,12 @@ qt_add_qml_module(appEbooks_reader
         SOURCES booksproxymodel.cpp
         SOURCES bookenums.hpp
         SOURCES
+        QML_FILES BooksPage.qml
+        QML_FILES ScrollBarCustom.qml
+        QML_FILES ReaderComboBox.qml
+        QML_FILES MorePage.qml
+        QML_FILES
+        RESOURCES assets/loading.gif
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

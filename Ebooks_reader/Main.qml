@@ -37,25 +37,17 @@ Window {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }
-                Rectangle {
+                BooksPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Text {
-                        anchors.centerIn: parent
-                        text: "My Books"
-                    }
                 }
                 DiscoverPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }
-                Rectangle {
+                MorePage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Text {
-                        anchors.centerIn: parent
-                        text: "More"
-                    }
                 }
             }
         }

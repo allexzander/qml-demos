@@ -4,6 +4,9 @@
 BooksProxyModel::BooksProxyModel(QObject* parent)
     : QSortFilterProxyModel(parent)
 {
+    // Default sort: newest first
+    setDynamicSortFilter(true);
+    applySorting();
 }
 
 void BooksProxyModel::setLimit(int value)
@@ -11,10 +14,11 @@ void BooksProxyModel::setLimit(int value)
     if (m_limit == value)
         return;
 
+    beginResetModel();
     m_limit = value;
-    emit limitChanged();
+    endResetModel();
 
-    invalidate();
+    emit limitChanged();
 }
 
 void BooksProxyModel::setOffset(int value)
@@ -24,19 +28,73 @@ void BooksProxyModel::setOffset(int value)
     if (m_offset == value)
         return;
 
+    beginResetModel();
     m_offset = value;
-    emit offsetChanged();
+    endResetModel();
 
-    invalidate();
+    emit offsetChanged();
+}
+
+void BooksProxyModel::setCategoryFilterEnabled(bool enabled)
+{
+    if (m_categoryFilterEnabled == enabled)
+        return;
+
+    beginFilterChange();
+    m_categoryFilterEnabled = enabled;
+    endFilterChange();
+
+    emit categoryFilterEnabledChanged();
 }
 
 void BooksProxyModel::setCategoryFilter(BookEnums::Category category)
 {
+    // If you set a category, we assume filtering becomes enabled.
+    // If you want "All", call clearCategoryFilter().
+    if (m_categoryFilterEnabled && m_categoryFilter == category)
+        return;
+
+    beginFilterChange();
     m_categoryFilter = category;
     m_categoryFilterEnabled = true;
+    endFilterChange();
 
     emit categoryFilterChanged();
-    invalidateFilter();
+    emit categoryFilterEnabledChanged();
+}
+
+void BooksProxyModel::clearCategoryFilter()
+{
+    if (!m_categoryFilterEnabled)
+        return;
+
+    beginFilterChange();
+    m_categoryFilterEnabled = false;
+    endFilterChange();
+
+    emit categoryFilterEnabledChanged();
+}
+
+void BooksProxyModel::setSortKey(BooksModel::SortKey key)
+{
+    if (m_sortKey == key)
+        return;
+
+    m_sortKey = key;
+    emit sortKeyChanged();
+
+    applySorting();
+}
+
+void BooksProxyModel::setSortOrder(Qt::SortOrder order)
+{
+    if (m_sortOrder == order)
+        return;
+
+    m_sortOrder = order;
+    emit sortOrderChanged();
+
+    applySorting();
 }
 
 int BooksProxyModel::rowCount(const QModelIndex& parent) const
@@ -62,15 +120,9 @@ QModelIndex BooksProxyModel::mapToSource(const QModelIndex& proxyIndex) const
     if (!proxyIndex.isValid())
         return {};
 
-    const int sourceRow = proxyIndex.row() + m_offset;
-
+    const int shiftedRow = proxyIndex.row() + m_offset;
     return QSortFilterProxyModel::mapToSource(
-        QSortFilterProxyModel::index(
-            sourceRow,
-            proxyIndex.column(),
-            proxyIndex.parent()
-            )
-        );
+        QSortFilterProxyModel::index(shiftedRow, proxyIndex.column(), proxyIndex.parent()));
 }
 
 QModelIndex BooksProxyModel::mapFromSource(const QModelIndex& sourceIndex) const
@@ -79,30 +131,64 @@ QModelIndex BooksProxyModel::mapFromSource(const QModelIndex& sourceIndex) const
         return {};
 
     const int proxyRow = sourceIndex.row() - m_offset;
-
     if (proxyRow < 0)
         return {};
 
-    return QSortFilterProxyModel::index(
-        proxyRow,
-        sourceIndex.column(),
-        sourceIndex.parent()
-        );
+    return QSortFilterProxyModel::index(proxyRow, sourceIndex.column(), sourceIndex.parent());
 }
 
-bool BooksProxyModel::filterAcceptsRow(int sourceRow,
-                                       const QModelIndex& sourceParent) const
+bool BooksProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     if (!m_categoryFilterEnabled)
         return true;
 
-    QModelIndex idx = sourceModel()->index(sourceRow, 0, sourceParent);
+    const QModelIndex idx = sourceModel()->index(sourceRow, 0, sourceParent);
     if (!idx.isValid())
         return false;
 
-    QVariant categoryData = idx.data(BooksModel::CategoryRole);
+    const QVariant categoryData = idx.data(BooksModel::CategoryRole);
     if (!categoryData.isValid())
         return false;
 
     return categoryData.value<BookEnums::Category>() == m_categoryFilter;
+}
+
+bool BooksProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    // Compare values by the sort role currently configured
+    const int role = sortRole();
+
+    const QVariant a = sourceModel()->data(left, role);
+    const QVariant b = sourceModel()->data(right, role);
+
+    // Date
+    if (role == BooksModel::AddedAtRole)
+        return a.toDateTime() < b.toDateTime();
+
+    // Title/Author (QString)
+    if (role == BooksModel::TitleRole || role == BooksModel::AuthorRole)
+        return QString::localeAwareCompare(a.toString(), b.toString()) < 0;
+
+    // Numeric
+    if (a.canConvert<double>() && b.canConvert<double>())
+        return a.toDouble() < b.toDouble();
+
+    // Fallback
+    return QString::localeAwareCompare(a.toString(), b.toString()) < 0;
+}
+
+int BooksProxyModel::sortRoleForKey(BooksModel::SortKey key) const
+{
+    switch (key) {
+    case BooksModel::SortKey::Title:  return BooksModel::TitleRole;
+    case BooksModel::SortKey::Author: return BooksModel::AuthorRole;
+    case BooksModel::SortKey::Date:   return BooksModel::AddedAtRole;
+    }
+    return BooksModel::AddedAtRole;
+}
+
+void BooksProxyModel::applySorting()
+{
+    setSortRole(sortRoleForKey(m_sortKey));
+    sort(0, m_sortOrder); // triggers lessThan()
 }

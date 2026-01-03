@@ -51,7 +51,6 @@ Row {
                     layer.effect: MultiEffect {
                         saturation: -1.0
                     }
-
                 }
             }
 

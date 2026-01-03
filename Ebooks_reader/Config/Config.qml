@@ -14,7 +14,9 @@ QtObject {
     readonly property int descriptionFontPixelSize: 14
     readonly property int infoFontPixelSize: 16
     readonly property color titleFontColor: "#000000"
+    readonly property color titleFontNegativeColor: "#ffffff"
     readonly property color descriptionFontColor: "#777777"
+    readonly property color descriptionFontNegativeColor: "#ffffff"
     readonly property color deviderColor: "#D0D0D0"
     readonly property int maxBooksInCollectionsPreview: 3
     readonly property int mediumMargin: 16
@@ -25,4 +27,9 @@ QtObject {
     readonly property real bookCoverAspect: 1.55 // portrait
     readonly property int tinySpacing: 2
     readonly property int smallSpacing: 16
+    readonly property color listElementSelectedColor: "#000000"
+    readonly property color listElementColor: "transparent"
+    readonly property color scrollBarHandleColor: "#ffffff"
+    readonly property color popupBackgroundColor: "#ffffff"
+    readonly property int loadingIndicatorSize: 64
 }

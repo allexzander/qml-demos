@@ -24,7 +24,9 @@ public:
     enum class Location {
         EBooks,
         AudioBooks,
-        OneDrive
+        OneDrive,
+        PDF,
+        ePUB
     };
     Q_ENUM(Location)
 };
