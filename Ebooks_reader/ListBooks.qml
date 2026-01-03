@@ -65,7 +65,7 @@ Row {
                 visible: root.showProgress
                 width: parent.width
                 horizontalAlignment: Text.AlignLeft
-                text: qsTr("%1% Read").arg(progress)
+                text: qsTr("%1% Read").arg(progress * 100)
                 font.pixelSize: Config.titleFontPixelSize
                 color: "#000000"
             }

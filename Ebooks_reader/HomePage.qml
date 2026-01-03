@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import Config
+import Ebooks_reader
 
 Item {
     id: root
@@ -17,30 +18,24 @@ Item {
     readonly property real bookWidth: totalBooksWidth / lastReadBooksDisplayCount
     readonly property real bookHeight: Math.min(bookWidth * bookAspectRatio, height)
 
-    ListModel {
-        id: lastReadBooks
-        ListElement { progress: 2;  remaining: 18000; bookCoverSource: "assets/books/book1.jpg" }
-        ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book2.jpg" }
-        ListElement { progress: 2;  remaining: 7200;  bookCoverSource: "assets/books/book3.jpg" }
-        ListElement { progress: 3;  remaining: 14400; bookCoverSource: "assets/books/book4.jpg" }
+    BooksProxyModel {
+        id: lastReadProxy
+        sourceModel: BooksModel
+        limit: 4
     }
 
-
-    ListModel {
-        id: availableBooks
-        ListElement { bookCoverSource: "assets/books/book5.jpg" }
-        ListElement { bookCoverSource: "assets/books/book6.jpg" }
-        ListElement { bookCoverSource: "assets/books/book7.jpg" }
-        ListElement { bookCoverSource: "assets/books/book8.jpg" }
-        ListElement { bookCoverSource: "assets/books/book9.jpg" }
-        ListElement { bookCoverSource: "assets/books/book10.jpg" }
+    BooksProxyModel {
+        id: booksModelLeft
+        sourceModel: BooksModel
+        limit: 3
+        offset: 9
     }
 
-    ListModel {
-        id: availableBooksCollection
-        ListElement { bookCoverSource: "assets/books/book8.jpg" }
-        ListElement { bookCoverSource: "assets/books/book9.jpg" }
-        ListElement { bookCoverSource: "assets/books/book10.jpg" }
+    BooksProxyModel {
+        id: booksModelRight
+        sourceModel: BooksModel
+        categoryFilter: Book.Manga
+        limit: 3
     }
 
     ListBooks {
@@ -57,7 +52,7 @@ Item {
 
         showProgress: true
 
-        model: lastReadBooks
+        model: lastReadProxy
     }
 
     BookStack {
@@ -66,13 +61,13 @@ Item {
         anchors.top: library.bottom
         anchors.left: library.left
         width: root.bookWidth * 2 + root.booksSpacing
-        model: availableBooks
+        model: booksModelLeft
         xOffsetStep: (width - bookWidth + root.booksSpacing) / (maxBooks - 1)
         bookWidth: root.bookWidth
         bookHeight: root.bookHeight
-        maxBooks: Math.min(Config.maxBooksInCollectionsPreview, availableBooks.count)
+        maxBooks: Math.min(Config.maxBooksInCollectionsPreview, bookStackLeft.count)
         title: qsTr("My Books")
-        subtitle: qsTr("%1 Books").arg(availableBooks.count)
+        subtitle: qsTr("%1 Books").arg(BooksModel.rowCount())
     }
 
     BookStack {
@@ -81,11 +76,11 @@ Item {
         anchors.top: library.bottom
         anchors.right: library.right
         width: root.bookWidth * 2 + root.booksSpacing
-        model: availableBooksCollection
+        model: booksModelRight
         xOffsetStep: (width - bookWidth + root.booksSpacing) / (maxBooks - 1)
         bookWidth: root.bookWidth
         bookHeight: root.bookHeight
-        maxBooks: Math.min(Config.maxBooksInCollectionsPreview, availableBooksCollection.count)
+        maxBooks: Math.min(Config.maxBooksInCollectionsPreview, bookStackRight.count)
         title: qsTr("Manga")
         subtitle: qsTr("Collection")
     }
@@ -95,7 +90,7 @@ Item {
         anchors.top: bookStackLeft.bottom
         anchors.left: bookStackLeft.left
         title: qsTr("Find your next great read")
-        subtitle: qsTr("Shop Kobo")
+        subtitle: qsTr("Shop Books")
         maxWidth: bookStackLeft.width
     }
 

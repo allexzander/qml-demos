@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
 import Config
+import Ebooks_reader
 
 Item {
     id: root
@@ -10,7 +11,6 @@ Item {
     readonly property int booksSpacing: Config.mediumMargin
     readonly property int lastReadBooksDisplayCount: Config.lastReadBooksDisplayCount
     readonly property real bookAspectRatio: Config.bookCoverAspect
-
     readonly property int scrollBarPadding: Config.mediumMargin
 
     readonly property real totalSpacing:
@@ -24,32 +24,6 @@ Item {
 
     readonly property real bookHeight:
         bookWidth * bookAspectRatio
-
-
-    ListModel {
-        id: listBooksEbook
-        ListElement { progress: 2; remaining: 18000; bookCoverSource: "assets/books/book5.jpg" }
-        ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book6.jpg" }
-        ListElement { progress: 2; remaining: 7200;  bookCoverSource: "assets/books/book8.jpg" }
-        ListElement { progress: 3; remaining: 14400; bookCoverSource: "assets/books/book9.jpg" }
-    }
-
-    ListModel {
-        id: listBooksAudio
-        ListElement { progress: 2; remaining: 18000; bookCoverSource: "assets/books/book10.jpg" }
-        ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book2.jpg" }
-        ListElement { progress: 2; remaining: 7200;  bookCoverSource: "assets/books/book1.jpg" }
-        ListElement { progress: 3; remaining: 14400; bookCoverSource: "assets/books/book7.jpg" }
-    }
-
-    ListModel {
-        id: listBooksOneDrive
-        ListElement { progress: 2; remaining: 18000; bookCoverSource: "assets/books/book1.jpg" }
-        ListElement { progress: 21; remaining: 14400; bookCoverSource: "assets/books/book2.jpg" }
-        ListElement { progress: 2; remaining: 7200;  bookCoverSource: "assets/books/book3.jpg" }
-        ListElement { progress: 3; remaining: 14400; bookCoverSource: "assets/books/book4.jpg" }
-    }
-
 
     ColumnLayout {
         anchors.fill: parent
@@ -77,13 +51,11 @@ Item {
                 maxTabTextWidth = max
             }
 
-            background: Item {
-                Rectangle {
-                    anchors.bottom: parent.bottom
-                    width: parent.width
-                    height: 1
-                    color: Config.deviderColor
-                }
+            background: Rectangle {
+                anchors.bottom: parent.bottom
+                width: parent.width
+                height: 1
+                color: Config.deviderColor
             }
 
             Repeater {
@@ -105,11 +77,9 @@ Item {
             Layout.fillHeight: true
             currentIndex: tabs.currentIndex
 
-
             Flickable {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-
                 clip: true
                 flickableDirection: Flickable.VerticalFlick
 
@@ -117,36 +87,19 @@ Item {
                 contentHeight: ebooksColumn.implicitHeight
 
                 ScrollBar.vertical: ScrollBar {
-                    id: scrollBar
                     policy: ScrollBar.AsNeeded
                 }
 
                 Column {
                     id: ebooksColumn
-                    width: parent.width - scrollBar.width - scrollBarPadding
+                    width: parent.width - scrollBarPadding
                     spacing: Config.largeMargin
 
                     readonly property var sections: [
-                        {
-                            name: "Best of Non-Fiction",
-                            actionLabel: "View all",
-                            model: listBooksEbook
-                        },
-                        {
-                            name: "Newest Arrivals",
-                            actionLabel: "View all",
-                            model: listBooksEbook
-                        },
-                        {
-                            name: "Bestsellers 2025",
-                            actionLabel: "View all",
-                            model: listBooksEbook
-                        },
-                        {
-                            name: "Recommended for You",
-                            actionLabel: "View all",
-                            model: listBooksEbook
-                        }
+                        { name: "Best of Non-Fiction",    offset: 0  },
+                        { name: "Newest Arrivals",       offset: 4  },
+                        { name: "Bestsellers 2025",      offset: 12  },
+                        { name: "Recommended for You",  offset: 8 }
                     ]
 
                     Repeater {
@@ -155,15 +108,19 @@ Item {
                         DiscoverPageSection {
                             width: ebooksColumn.width
                             spacing: Config.mediumMargin
+                            booksSpacing: root.booksSpacing
 
                             name: modelData.name
-                            actionLabel: modelData.actionLabel
-                            model: modelData.model
-                            booksSpacing: root.booksSpacing
+                            actionLabel: "View all"
+
+                            model: BooksProxyModel {
+                                sourceModel: BooksModel
+                                limit: 4
+                                offset: modelData.offset
+                            }
                         }
                     }
                 }
-
             }
 
 
@@ -186,20 +143,9 @@ Item {
                     spacing: Config.largeMargin
 
                     readonly property var sections: [
-                        {
-                            name: "Favorite Voice",
-                            actionLabel: "View all",
-                            model: listBooksAudio
-                        },
-                        {
-                            name: "Top Narrators",
-                            actionLabel: "View all",
-                            model: listBooksAudio
-                        },                        {
-                            name: "Selected Books",
-                            actionLabel: "View all",
-                            model: listBooksAudio
-                        }
+                        { name: "Favorite Voice",  offset: 4 },
+                        { name: "Top Narrators",   offset: 8 },
+                        { name: "Selected Books", offset: 12 }
                     ]
 
                     Repeater {
@@ -208,16 +154,20 @@ Item {
                         DiscoverPageSection {
                             width: audioColumn.width
                             spacing: Config.mediumMargin
+                            booksSpacing: root.booksSpacing
 
                             name: modelData.name
-                            actionLabel: modelData.actionLabel
-                            model: modelData.model
-                            booksSpacing: root.booksSpacing
+                            actionLabel: "View all"
+
+                            model: BooksProxyModel {
+                                sourceModel: BooksModel
+                                limit: 4
+                                offset: modelData.offset
+                            }
                         }
                     }
                 }
             }
-
 
             Flickable {
                 Layout.fillWidth: true
@@ -238,26 +188,10 @@ Item {
                     spacing: Config.largeMargin
 
                     readonly property var sections: [
-                        {
-                            name: "Award Winners",
-                            actionLabel: "View all",
-                            model: listBooksOneDrive
-                        },
-                        {
-                            name: "Recently Synced",
-                            actionLabel: "View all",
-                            model: listBooksOneDrive
-                        },
-                        {
-                            name: "Actively Read",
-                            actionLabel: "View all",
-                            model: listBooksOneDrive
-                        },
-                        {
-                            name: "Rarely Read",
-                            actionLabel: "View all",
-                            model: listBooksOneDrive
-                        }
+                        { name: "Award Winners",   offset: 3  },
+                        { name: "Recently Synced", offset: 10  },
+                        { name: "Actively Read",   offset: 14  },
+                        { name: "Rarely Read",     offset: 0 }
                     ]
 
                     Repeater {
@@ -266,16 +200,20 @@ Item {
                         DiscoverPageSection {
                             width: onedriveColumn.width
                             spacing: Config.mediumMargin
+                            booksSpacing: root.booksSpacing
 
                             name: modelData.name
-                            actionLabel: modelData.actionLabel
-                            model: modelData.model
-                            booksSpacing: root.booksSpacing
+                            actionLabel: "View all"
+
+                            model: BooksProxyModel {
+                                sourceModel: BooksModel
+                                limit: 4
+                                offset: modelData.offset
+                            }
                         }
                     }
                 }
             }
-
         }
     }
 }

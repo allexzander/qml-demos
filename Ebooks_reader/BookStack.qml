@@ -8,6 +8,7 @@ Item {
     property alias model: repeater.model
     property alias title: title.text
     property alias subtitle: subtitle.text
+    property alias count: repeater.count
     property int maxBooks: 3
     property real bookWidth: 120
     property real bookHeight: bookWidth * aspectRatio
@@ -18,6 +19,7 @@ Item {
     width: bookWidth + xOffsetStep * (maxBooks - 1)
     implicitHeight: bookHeight + labels.implicitHeight
 
+
     Item {
         id: stack
         width: parent.width
@@ -27,17 +29,12 @@ Item {
             id: repeater
 
             delegate: Item {
-                required property string bookCoverSource
-                required property int index
-
-                visible: index < root.maxBooks
-
                 width: root.bookWidth
                 height: root.bookHeight - index * root.yOffsetStep
 
                 x: index * root.xOffsetStep
                 y: index * root.yOffsetStep
-                z: root.maxBooks - index   // leftmost on top
+                z: root.maxBooks - index
 
                 Image {
                     id: cover
@@ -45,7 +42,6 @@ Item {
                     source: bookCoverSource
                     fillMode: Image.PreserveAspectFit
                     smooth: true
-                    visible: false
                 }
 
                 MultiEffect {
@@ -55,6 +51,7 @@ Item {
                 }
             }
         }
+
     }
 
     Column {
