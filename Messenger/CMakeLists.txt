@@ -40,7 +40,7 @@ qt_add_qml_module(appMessenger
         "assets/icons/icon-videocall.svg"
         "assets/icons/icon-write.svg"
         "assets/icons/new-message-icon.svg"
-        "assets/user_photos/user_photo_1.jpg"
+
         "assets/user_photos/user_photo_2.jpg"
         "assets/user_photos/user_photo_3.jpg"
         "assets/user_photos/user_photo_4.jpg"
@@ -64,6 +64,7 @@ qt_add_qml_module(appMessenger
 
     DEPENDENCIES
         TARGET Config
+        RESOURCES assets/user_photos/user_photo_1.jpg
 )
 
 add_subdirectory(Config)

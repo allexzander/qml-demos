@@ -11,7 +11,7 @@ ApplicationWindow {
     minimumWidth: 800
     minimumHeight: 600
     visible: true
-    title: qsTr("Hello World")
+    title: qsTr("Messenger")
 
     RowLayout {
         id: mainContainer
