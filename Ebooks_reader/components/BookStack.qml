@@ -42,16 +42,14 @@ Item {
                     source: bookCoverSource
                     fillMode: Image.PreserveAspectFit
                     smooth: true
-                }
 
-                MultiEffect {
-                    anchors.fill: cover
-                    source: cover
-                    saturation: -1.0
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        saturation: -1.0
+                    }
                 }
             }
         }
-
     }
 
     Column {

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "maintabs"
 import Config
 
 Window {
@@ -13,6 +14,7 @@ Window {
     title: qsTr("E-books reader")
 
     Column {
+        opacity: controlCenter.brightness
         anchors.fill: parent
         anchors.topMargin: controlCenter.collapsedHeight + Config.contentTopMargin
 
@@ -70,10 +72,10 @@ Window {
 
             Repeater {
                 model: [
-                    { label: "Home",     iconSource: "assets/icon-home.svg" },
-                    { label: "My Books", iconSource: "assets/icon-books.svg" },
-                    { label: "Discover", iconSource: "assets/icon-discover.svg" },
-                    { label: "More",     iconSource: "assets/icon-more.svg" }
+                    { label: "Home",     iconSource: "../assets/icon-home.svg" },
+                    { label: "My Books", iconSource: "../assets/icon-books.svg" },
+                    { label: "Discover", iconSource: "../assets/icon-discover.svg" },
+                    { label: "More",     iconSource: "../assets/icon-more.svg" }
                 ]
 
                 MainTabsButton {
@@ -86,13 +88,37 @@ Window {
         }
     }
 
+    Rectangle {
+        id: overlay
+        x: 0
+        y: 0
+        z: 999
+        width: parent.width
+        height: parent.height
+        opacity: visible ? 0.5 : 0.0
+        color: Config.descriptionFontColor
+        visible: controlCenter.expanded
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 180
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                controlCenter.collapse()
+            }
+        }
+    }
+
     ControlCenter {
         id: controlCenter
         x: 0
         y: 0
         width:root.width
-        collapsedHeight: 80
-        expandedHeight: Math.round(root.height * 0.75)
         z: 1000
     }
 }

@@ -19,17 +19,17 @@ qt_add_qml_module(appEbooks_reader
     QML_FILES
         Main.qml
         RESOURCES  assets/icon-discover.svg assets/icon-home.svg assets/icon-more.svg
-        QML_FILES MainTabsButton.qml
+        QML_FILES maintabs/MainTabsButton.qml
         QML_FILES ControlCenter.qml
         RESOURCES assets/icon-battery.svg assets/icon-books.svg assets/icon-brightness.svg assets/icon-refresh.svg assets/icon-search.svg assets/icon-wifi.svg
-        QML_FILES HomePage.qml
+        QML_FILES maintabs/HomePage.qml
         RESOURCES assets/books/book1.jpg assets/books/book2.jpg assets/books/book3.jpg assets/books/book4.jpg
         RESOURCES assets/books/book5.jpg assets/books/book6.jpg assets/books/book7.jpg assets/books/book8.jpg assets/books/book9.jpg assets/books/book10.jpg
-        QML_FILES BookStack.qml
-        QML_FILES InfoCard.qml
+        QML_FILES components/BookStack.qml
+        QML_FILES components/InfoCard.qml
     DEPENDENCIES
         TARGET Config
-        QML_FILES DiscoverPage.qml
+        QML_FILES maintabs/DiscoverPage.qml
         RESOURCES
         QML_FILES TabsButton.qml
         RESOURCES
@@ -45,12 +45,16 @@ qt_add_qml_module(appEbooks_reader
         SOURCES booksproxymodel.cpp
         SOURCES bookenums.hpp
         SOURCES
-        QML_FILES BooksPage.qml
-        QML_FILES ScrollBarCustom.qml
-        QML_FILES ReaderComboBox.qml
-        QML_FILES MorePage.qml
+        QML_FILES maintabs/BooksPage.qml
+        QML_FILES components/ScrollBarCustom.qml
+        QML_FILES components/ReaderComboBox.qml
+        QML_FILES maintabs/MorePage.qml
         QML_FILES
         RESOURCES assets/loading.gif
+        QML_FILES components/Devider.qml
+        RESOURCES assets/icon-beta.svg assets/icon-chart.svg assets/icon-dropbox.svg assets/icon-heart.svg assets/icon-help.svg assets/icon-settings.svg assets/icon-shield.svg
+        QML_FILES components/BooksListElement.qml
+        RESOURCES assets/icon-chevrondown.svg assets/icon-chevronup.svg
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

@@ -20,11 +20,8 @@ Item {
         width: parent.width
         spacing: 6
 
-        Rectangle {
-            visible: true
+        Devider {
             width: parent.width
-            height: 1
-            color: Config.deviderColor
         }
 
         Text {

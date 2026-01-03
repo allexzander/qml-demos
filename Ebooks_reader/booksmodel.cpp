@@ -103,7 +103,7 @@ void BooksModel::generateDummyDataFromCovers()
 
         b.size = s.size;
 
-        b.coverSource = QString("assets/books/book%1.jpg").arg(s.coverIndex);
+        b.coverSource = QString("qrc:/qt/qml/Ebooks_reader/assets/books/book%1.jpg").arg(s.coverIndex);
 
         b.progress = qBound(0.0, (s.coverIndex % 6) * 0.15, 1.0);
 

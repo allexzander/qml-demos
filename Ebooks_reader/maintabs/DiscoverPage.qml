@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../components"
 import Config
 import Ebooks_reader
 
@@ -51,11 +52,9 @@ Item {
                 maxTabTextWidth = max
             }
 
-            background: Rectangle {
+            background: Devider {
                 anchors.bottom: parent.bottom
                 width: parent.width
-                height: 1
-                color: Config.deviderColor
             }
 
             Repeater {
