@@ -4,7 +4,6 @@
 BooksProxyModel::BooksProxyModel(QObject* parent)
     : QSortFilterProxyModel(parent)
 {
-    // Default sort: newest first
     setDynamicSortFilter(true);
     applySorting();
 }
@@ -49,8 +48,6 @@ void BooksProxyModel::setCategoryFilterEnabled(bool enabled)
 
 void BooksProxyModel::setCategoryFilter(BookEnums::Category category)
 {
-    // If you set a category, we assume filtering becomes enabled.
-    // If you want "All", call clearCategoryFilter().
     if (m_categoryFilterEnabled && m_categoryFilter == category)
         return;
 
@@ -155,25 +152,20 @@ bool BooksProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceP
 
 bool BooksProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    // Compare values by the sort role currently configured
     const int role = sortRole();
 
     const QVariant a = sourceModel()->data(left, role);
     const QVariant b = sourceModel()->data(right, role);
 
-    // Date
     if (role == BooksModel::AddedAtRole)
         return a.toDateTime() < b.toDateTime();
 
-    // Title/Author (QString)
     if (role == BooksModel::TitleRole || role == BooksModel::AuthorRole)
         return QString::localeAwareCompare(a.toString(), b.toString()) < 0;
 
-    // Numeric
     if (a.canConvert<double>() && b.canConvert<double>())
         return a.toDouble() < b.toDouble();
 
-    // Fallback
     return QString::localeAwareCompare(a.toString(), b.toString()) < 0;
 }
 
@@ -190,5 +182,5 @@ int BooksProxyModel::sortRoleForKey(BooksModel::SortKey key) const
 void BooksProxyModel::applySorting()
 {
     setSortRole(sortRoleForKey(m_sortKey));
-    sort(0, m_sortOrder); // triggers lessThan()
+    sort(0, m_sortOrder);
 }
